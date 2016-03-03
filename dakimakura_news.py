@@ -6,6 +6,7 @@ import datetime
 import dateutil.tz
 from pytz import timezone
 import sys
+import json
 
 from html.parser import HTMLParser
 
@@ -58,24 +59,6 @@ simple_info_list = bs_simple.find_all('td')
 i = info_start_line+1
 img_index = 0
 simple_info_index = 3
-while i < len(new_list):
-    tmpDaki = dict()
-    tmpDaki['publish_date'] = new_list[i].replace('【', '').replace('】', '')
-    tmpDaki['name'] = new_list[i+1].split('：')[1].strip()
-    tmpDaki['maker'] = new_list[i+2].split('：')[1].strip()
-    tmpDaki['size'] = new_list[i+3].split('：')[1].strip()
-    tmpDaki['price'] = new_list[i+4].split('：')[1].strip()
-    tmpDaki['material'] = new_list[i+5].split('：')[1].strip()
-    tmpDaki['sale_date'] = new_list[i+6].split('：')[1].strip()
-    tmpDaki['sale_by'] = new_list[i+7].split('：')[1].strip()
-    tmpDaki['other'] = new_list[i+8].split('：')[1].strip()
-    tmpDaki['image'] = img_list[img_index]['src']
-    if simple_info_list[simple_info_index+1].a is not None:
-        tmpDaki['link_item'] = simple_info_list[simple_info_index+1].a['href']
-    dakimakura_list.append(tmpDaki)
-    i += 9
-    img_index += 1
-    simple_info_index += 3
 
 content_template = """
 <img src="%s" />
@@ -91,26 +74,49 @@ content_template = """
 </p>
 """
 
-fg = FeedGenerator()
-fg.id('http://www.nijigenshingu.info/index2.shtml')
-fg.title('イ～☆えるの二次元★寝具情報')
-fg.link(href='http://www.nijigenshingu.info/index2.shtml')
-fg.language('jp')
-fg.description('イ～☆えるの二次元★寝具情報')
+while i < len(new_list):
+    tmpDaki = dict()
+    tmpDaki['publish_date'] = new_list[i].replace('【', '').replace('】', '')
+    tmpDaki['name'] = new_list[i+1].split('：')[1].strip()
+    tmpDaki['maker'] = new_list[i+2].split('：')[1].strip()
+    tmpDaki['size'] = new_list[i+3].split('：')[1].strip()
+    tmpDaki['price'] = new_list[i+4].split('：')[1].strip()
+    tmpDaki['material'] = new_list[i+5].split('：')[1].strip()
+    tmpDaki['sale_date'] = new_list[i+6].split('：')[1].strip()
+    tmpDaki['sale_by'] = new_list[i+7].split('：')[1].strip()
+    tmpDaki['other'] = new_list[i+8].split('：')[1].strip()
+    tmpDaki['image'] = img_list[img_index]['src']
+    if simple_info_list[simple_info_index+1].a is not None:
+        tmpDaki['link_item'] = simple_info_list[simple_info_index+1].a['href']
+    tmpDaki['description'] = content_template % (tmpDaki['image'], tmpDaki['name'], tmpDaki['maker'], tmpDaki['size'], tmpDaki['price'], tmpDaki['material'], tmpDaki['sale_date'], tmpDaki['sale_by'], tmpDaki['other'])
+    dakimakura_list.append(tmpDaki)
+    i += 9
+    img_index += 1
+    simple_info_index += 3
 
-for i in dakimakura_list:
-    fe = fg.add_entry()
-    fe.title(i['name'])
-    fe.published(timezone('Asia/Tokyo').localize(dateutil.parser.parse(i['publish_date'])))
-    fe.updated(datetime.datetime.now(timezone('Asia/Taipei')))
-    if 'link_item' in i:
-        fe.id(i['link_item'])
-        fe.link({'href': i['link_item']})
-    else:
-        fe.id(i['name'])
-    fe.description(content_template % (i['image'], i['name'], i['maker'], i['size'], i['price'], i['material'],
-                                   i['sale_date'], i['sale_by'], i['other']))
-print(fg.rss_str().decode('utf-8'))
+dakimakura_list_JSON = json.dumps(dakimakura_list)
+print(dakimakura_list_JSON)
+
+# fg = FeedGenerator()
+# fg.id('http://www.nijigenshingu.info/index2.shtml')
+# fg.title('イ～☆えるの二次元★寝具情報')
+# fg.link(href='http://www.nijigenshingu.info/index2.shtml')
+# fg.language('jp')
+# fg.description('イ～☆えるの二次元★寝具情報')
+
+# for i in dakimakura_list:
+#     fe = fg.add_entry()
+#     fe.title(i['name'])
+#     fe.published(timezone('Asia/Tokyo').localize(dateutil.parser.parse(i['publish_date'])))
+#     fe.updated(datetime.datetime.now(timezone('Asia/Taipei')))
+#     if 'link_item' in i:
+#         fe.id(i['link_item'])
+#         fe.link({'href': i['link_item']})
+#     else:
+#         fe.id(i['name'])
+#     fe.description(content_template % (i['image'], i['name'], i['maker'], i['size'], i['price'], i['material'],
+#                                    i['sale_date'], i['sale_by'], i['other']))
+# print(fg.rss_str().decode('utf-8'))
 # for i in bs.find_all('td'):
 #     print(i)
 
