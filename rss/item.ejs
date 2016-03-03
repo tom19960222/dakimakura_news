@@ -1,0 +1,5 @@
+<% include head %>
+<% items.forEach(function(item){ %>
+	<item><title><%= item.name %></title><link><%= item.link_item %></link><description><%= item.description %></description><guid isPermaLink="false"><%= item.link_item %></guid><pubDate><%= item.pubDate %></pubDate></item>	
+<% }); %>
+<% include tail %>
