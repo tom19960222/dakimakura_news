@@ -1,6 +1,6 @@
 # For people who are lazy to read this
 
-Use your RSS reader to subscribe [http://rss.hsexpert.net/dakimakura_news](http://rss.hsexpert.net/dakimakura_news)
+Use your RSS reader to subscribe [http://rss.hsexpert.net/dakimakura_news?appendmonthes=1](http://rss.hsexpert.net/dakimakura_news?appendmonthes=1)
 
 # Getting started
 
